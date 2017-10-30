@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 
 import com.red5pro.streaming.R5Connection;
 import com.red5pro.streaming.R5Stream;
@@ -31,10 +32,12 @@ import red5pro.org.testandroidproject.tests.TestContent;
 public class SubscribeTest extends TestDetailFragment implements R5ConnectionListener {
     protected R5VideoView display;
     protected R5Stream subscribe;
+    private Button button;
 
     @Override
     public void onConnectionEvent(R5ConnectionEvent event) {
-        Log.d("Subscriber", ":onConnectionEvent " + event.name());
+        Log.e("Subscriber", ":onConnectionEvent " + event.name());
+        Log.e("Subscriber", ":onConnectionMessage " + event.message);
         if (event.name() == R5ConnectionEvent.LICENSE_ERROR.name()) {
             Handler h = new Handler(Looper.getMainLooper());
             h.post(new Runnable() {
@@ -66,7 +69,20 @@ public class SubscribeTest extends TestDetailFragment implements R5ConnectionLis
 
         //find the view and attach the stream
         display = (R5VideoView) view.findViewById(R.id.videoView);
-
+        button = (Button) view.findViewById(R.id.pause_video_now);
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (subscribe != null) {
+                            subscribe.stop();
+                        }
+                    }
+                });
+            }
+        });
         Subscribe();
 
         return view;
